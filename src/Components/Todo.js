@@ -22,7 +22,6 @@ const Todo = () => {
     // Add Item
     const addItem = () => {
         if(!inputData){
-            alert('Please Fill The Data.')
         }
         else if(inputData && !toggleSubmit){
             setItems(
