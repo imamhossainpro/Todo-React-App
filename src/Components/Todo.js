@@ -16,21 +16,45 @@ const getLocalItems = () => {
 const Todo = () => {
     const [inputData, setInputData] = useState('');
     const [items, setItems] = useState(getLocalItems());
+    const [toggleSubmit, setToggleSubmit] = useState(true);
+    const [isEditItem, setEditItem] = useState(null);
 
     // Add Item
     const addItem = () => {
         if(!inputData){
-
-        }else{
-            setItems([...items, inputData])
+            alert('Please Fill The Data.')
+        }
+        else if(inputData && !toggleSubmit){
+            setItems(
+                items.map(element => {
+                    if(element.id === isEditItem){
+                        return {...element, name: inputData}
+                    }
+                    return element;
+                })
+            )
+            setToggleSubmit(true);
+            setInputData('');
+            setEditItem(null);
+        }
+        else{
+            const allInputData = {id: new Date().getTime().toString(), name: inputData}
+            setItems([...items, allInputData])
             setInputData('');
         } 
     }
+    //Edit Item
+    const editItem = (id) => {
+        let newEditItem = items.find(element => element.id === id);
+        setToggleSubmit(false);
+        setInputData(newEditItem.name);
+        setEditItem(id);
+    }
 
     // Delete Unique Items
-    const deleteItem = (id) => {
-        const updateditems = items.filter((elem, index) => {
-            return index !== id;
+    const deleteItem = (index) => {
+        const updateditems = items.filter((element) => {
+            return index !== element.id;
         });
 
         setItems(updateditems);
@@ -57,15 +81,20 @@ const Todo = () => {
             </figure>
             <div className="addItems">
                 <input value={inputData} onChange={(e) => setInputData(e.target.value)} type="text"  placeholder='🖊️ Add items...'/>
-                <i className="fa fa-plus add-btn" title='Add item' onClick={addItem}></i>
+                {
+                    toggleSubmit ? <i className="fa fa-plus add-btn" title='Add item' onClick={addItem}></i> : <i className="far fa-edit add-btn" title='Add item' onClick={addItem}></i>
+                }
             </div>
             <div className="showItems">
                 {
-                    items.map((element, index) => {
+                    items.map((element) => {
                         return(
-                            <div className="eachItem" key={index}>
-                                <h3>{element}</h3>
-                                <i className="far fa-trash-alt add-btn" title='Delete Button' onClick={() => deleteItem(index)}></i>
+                            <div className="eachItem" key={element.id}>
+                                <h3>{element.name}</h3>
+                                <div className="todo-btn">
+                                <i className="far fa-edit add-btn" title='Edit Button' onClick={() => editItem(element.id)}></i>
+                                <i className="far fa-trash-alt add-btn" title='Delete Button' onClick={() => deleteItem(element.id)}></i>
+                                </div>
                              </div>
                         )
                     })
